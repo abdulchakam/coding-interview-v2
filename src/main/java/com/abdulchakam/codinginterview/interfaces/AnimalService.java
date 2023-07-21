@@ -5,7 +5,7 @@ import com.abdulchakam.codinginterview.dto.AnimalResponse;
 
 public interface AnimalService {
     void create(AnimalRequest animalRequest);
-    AnimalResponse all();
-    void update();
+    void update(AnimalRequest animalRequest);
     void delete(AnimalRequest animalRequest);
+    AnimalResponse all();
 }

@@ -1,6 +1,8 @@
 package com.abdulchakam.codinginterview.dog;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,5 +24,6 @@ public class DogRequest {
     @NotBlank(message = "Breed name is mandatory")
     private String breedName;
 
+    @Min(value = 1)
     private int getNumberOfImages;
 }

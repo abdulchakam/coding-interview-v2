@@ -15,6 +15,8 @@ import java.util.Map;
 @AllArgsConstructor
 public class DogResponseDto {
 
+    private Long id;
+
     private String dogName;
 
     private String breed;

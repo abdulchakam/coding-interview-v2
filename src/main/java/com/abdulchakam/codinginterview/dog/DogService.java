@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.server.ServerErrorException;
 
 import java.util.*;
@@ -42,16 +43,12 @@ public class DogService implements AnimalService {
 
         try {
             // Validate dog name
-            Optional<Dog> dogOptional = dogRepository.findByDogName(dogRequest.getDogName());
-            if (dogOptional.isPresent()) {
-                throw new DataAlreadyExistException("Dog name already exist");
-            }
-
-            if (dogRequest.getBreedName().equals("shiba") && dogRequest.getGetNumberOfImages() % 2 == 0) {
-                throw new BadRequestException("Sorry shiba, you can only choose an odd number of images :( ");
-            }
+            validateDogName(dogRequest);
+            onlyOddNumber(dogRequest, "shiba");
 
             Dog dog = dogFactory.fromRequest(dogRequest);
+            dog.setCreatedBy("SYSTEM");
+            dog.setCreatedDate(new Date());
 
             create(AnimalRequest.builder()
                     .dog(dog)
@@ -87,11 +84,11 @@ public class DogService implements AnimalService {
         Gson gson = new Gson();
 
         try {
-
             animalResponse = all();
 
             animalResponse.getDogList().forEach(dog -> {
                 DogResponseDto dogResponseDto = new DogResponseDto();
+                dogResponseDto.setId(dog.getId());
                 dogResponseDto.setBreed(dog.getBreed());
                 dogResponseDto.setDogName(dog.getDogName());
                 dogResponseDto.setImages(gson.fromJson(dog.getImages(), List.class));
@@ -167,6 +164,67 @@ public class DogService implements AnimalService {
                         .build());
     }
 
+    @Transactional
+    public ResponseEntity<DogResponse> updateDog(DogRequest dogRequest) {
+        log.info("Start update dog");
+        String statusMessage, message;
+        int status;
+
+        try {
+            validateDogName(dogRequest);
+            onlyOddNumber(dogRequest, "shiba");
+
+            Optional<Dog> dogOptional = dogRepository.findById(dogRequest.getId());
+            Dog dog = dogFactory.fromRequest(dogRequest);
+
+            if (dogOptional.isPresent()) {
+                dog.setCreatedDate(dogOptional.get().getCreatedDate());
+                dog.setCreatedBy("SYSTEM");
+            }
+            dog.setModifiedDate(new Date());
+            dog.setModifiedBy("SYSTEM");
+
+            update(AnimalRequest.builder()
+                    .dog(dog)
+                    .build());
+
+            statusMessage = HttpStatus.OK.getReasonPhrase();
+            status = HttpStatus.OK.value();
+            message = "Success update dog";
+
+        } catch (ServerErrorException e) {
+            statusMessage = HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase();
+            status = HttpStatus.INTERNAL_SERVER_ERROR.value();
+            message = "Error when update dog, "+ e.getMessage();
+        }
+
+        return ResponseEntity
+                .status(status)
+                .body(DogResponse.builder()
+                        .status(status)
+                        .statusMessage(statusMessage)
+                        .message(message)
+                        .request(dogRequest)
+                        .build());
+    }
+
+    void validateDogName(DogRequest dogRequest) {
+        Optional<Dog> dogOptional = dogRepository.findByDogName(dogRequest.getDogName());
+        if (dogOptional.isPresent() && ObjectUtils.isEmpty(dogRequest.getId())) {
+            throw new DataAlreadyExistException("Dog name already exist");
+
+        }
+        if (dogOptional.isPresent() && (dogRequest.getId()!= null && !dogRequest.getId().equals(dogOptional.get().getId()))) {
+            throw new DataAlreadyExistException("Dog name already exist");
+        }
+    }
+
+    void onlyOddNumber(DogRequest dogRequest, String breedName) {
+        if (dogRequest.getBreedName().equals(breedName) && dogRequest.getGetNumberOfImages() % 2 == 0) {
+            throw new BadRequestException("Sorry "+breedName+", you can only choose an odd number of images :( ");
+        }
+    }
+
     @Override
     public void create(AnimalRequest animalRequest) {
         // Save dog breed
@@ -191,8 +249,22 @@ public class DogService implements AnimalService {
     }
 
     @Override
-    public void update() {
+    public void update(AnimalRequest animalRequest) {
+        // Save dog breed
+        Dog result = dogRepository.save(animalRequest.getDog());
 
+        // Delete sub breed exist
+        if (!subBreedRepository.findByDogId(animalRequest.getDog().getId()).isEmpty()) {
+            subBreedRepository.deleteByDogId(animalRequest.getDog().getId());
+        }
+
+        // Save sub breed
+        List<SubBreed> subBreeds = new ArrayList<>();
+        for (SubBreed subBreed : animalRequest.getDog().getSubBreeds()) {
+            subBreed.setDog(result);
+            subBreeds.add(subBreed);
+        }
+        subBreedRepository.saveAll(subBreeds);
     }
 
     @Override

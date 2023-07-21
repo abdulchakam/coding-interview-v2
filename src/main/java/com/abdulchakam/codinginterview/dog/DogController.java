@@ -12,7 +12,7 @@ public class DogController {
     @Autowired
     private DogService dogService;
 
-    @PostMapping("/dog/store")
+    @PostMapping("/dog")
     public ResponseEntity<DogResponse> store(@Valid @RequestBody DogRequest request) {
         return dogService.dataFromRest(request);
     }
@@ -20,6 +20,11 @@ public class DogController {
     @GetMapping("/dog/all")
     public ResponseEntity<DogResponse> showAll() {
         return dogService.showAll();
+    }
+
+    @PutMapping("/dog")
+    public ResponseEntity<DogResponse> updateDog(@RequestBody DogRequest request) {
+        return dogService.updateDog(request);
     }
 
     @DeleteMapping("/dog")
