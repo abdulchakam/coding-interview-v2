@@ -2,13 +2,17 @@ package com.abdulchakam.codinginterview.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-
-import java.util.List;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "sub_breed")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class SubBreed {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

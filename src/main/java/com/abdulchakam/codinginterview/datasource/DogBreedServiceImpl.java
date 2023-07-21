@@ -16,9 +16,6 @@ public class DogBreedServiceImpl implements DogBreedService{
     @Autowired
     private RestTemplate restTemplate;
 
-    @Autowired
-    private DogBreedExtractor dogBreedExtractor;
-
     @Value("${dog.api.base-url}")
     private String apiBaseUrl;
 
@@ -36,7 +33,7 @@ public class DogBreedServiceImpl implements DogBreedService{
                 DogBreedResponse.class);
 
         if (response.getBody() != null) {
-            dogBreedResponse = dogBreedExtractor.extractSubToParentBreed(response.getBody().getMessage(), false);
+            dogBreedResponse = response.getBody();
         }
 
         return dogBreedResponse;
