@@ -3,6 +3,7 @@ package com.abdulchakam.codinginterview.datasource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -23,6 +24,7 @@ public class DogBreedServiceImpl implements DogBreedService{
     @Value("${dog.api.base-url}")
     private String apiBaseUrl;
 
+    @Cacheable("allBreeds")
     @Override
     public DogBreedResponse getAllBreed() {
         log.info("get all breed from data source");
@@ -54,6 +56,7 @@ public class DogBreedServiceImpl implements DogBreedService{
         }
     }
 
+    @Cacheable("subBreed")
     @Override
     public DogSubBreedAndImagesResponse getSubBreed(String breed) {
         log.info("get sub breed from data source");
@@ -79,6 +82,7 @@ public class DogBreedServiceImpl implements DogBreedService{
         }
     }
 
+    @Cacheable("images")
     @Override
     public DogSubBreedAndImagesResponse getImage(String breed, String subBreed, int numberOfImages) {
         log.info("get image from data source");

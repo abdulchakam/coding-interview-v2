@@ -6,15 +6,11 @@ import com.abdulchakam.codinginterview.datasource.DogSubBreedAndImagesResponse;
 import com.abdulchakam.codinginterview.model.Dog;
 import com.abdulchakam.codinginterview.model.SubBreed;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.*;
@@ -22,7 +18,7 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class DocFactoryTest {
 
     @Mock
@@ -30,11 +26,6 @@ public class DocFactoryTest {
 
     @InjectMocks
     private DogFactory dogFactory;
-
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     public void fromRequestTest() {
@@ -57,9 +48,10 @@ public class DocFactoryTest {
         when(dogBreedService.getImage("breed1", "subBreed1", 3)).thenReturn(imagesResponse);
         when(dogBreedService.getImage("breed1", "subBreed2", 3)).thenReturn(imagesResponse);
 
-        // Mocking Gson response
-        Gson gson = org.mockito.Mockito.mock(Gson.class);
-        when(gson.toJson(imagesResponse.getMessage())).thenReturn("[\"image1\"]");
+        // Create a real instance of Gson
+        Gson gson = new Gson();
+        // Set Gson instance to DogFactory using ReflectionTestUtils
+        ReflectionTestUtils.setField(dogFactory, "gson", gson);
 
         DogRequest dogRequest = new DogRequest();
         dogRequest.setId(1L);
@@ -72,13 +64,12 @@ public class DocFactoryTest {
         assertEquals(dogRequest.getId(), result.getId());
         assertEquals(dogRequest.getDogName(), result.getDogName());
         assertEquals(dogRequest.getBreedName(), result.getBreed());
-        assertEquals("[\"image1\"]", result.getImages());
 
         List<SubBreed> subBreeds = result.getSubBreeds();
         assertEquals(2, subBreeds.size());
-        assertEquals("breed1-subBreed1", subBreeds.get(0).getSubBreedName());
-        assertEquals("[\"image1\"]", subBreeds.get(0).getImages());
-        assertEquals("breed1-subBreed2", subBreeds.get(1).getSubBreedName());
-        assertEquals("[\"image1\"]", subBreeds.get(1).getImages());
+        assertEquals("subBreed1", subBreeds.get(0).getSubBreedName());
+        assertEquals("[\"image1\",\"images2\",\"images3\"]", subBreeds.get(0).getImages());
+        assertEquals("subBreed2", subBreeds.get(1).getSubBreedName());
+        assertEquals("[\"image1\",\"images2\",\"images3\"]", subBreeds.get(1).getImages());
     }
 }

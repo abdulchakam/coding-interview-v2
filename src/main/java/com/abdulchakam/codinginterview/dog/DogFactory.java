@@ -29,6 +29,7 @@ public class DogFactory {
 
     public Dog fromRequest(DogRequest request) {
         DogBreedResponse dogBreedResponse = dogBreedService.getAllBreed();
+        log.info("Response : {}", dogBreedResponse);
         Map<String, List<String>> breedMap = dogBreedResponse.getMessage();
 
         String breedName = request.getBreedName();
