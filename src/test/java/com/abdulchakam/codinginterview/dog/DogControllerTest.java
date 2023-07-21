@@ -1,8 +1,6 @@
 package com.abdulchakam.codinginterview.dog;
 
 import com.abdulchakam.codinginterview.dto.BaseResponse;
-import com.abdulchakam.codinginterview.model.Dog;
-import com.abdulchakam.codinginterview.model.SubBreed;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
@@ -16,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
