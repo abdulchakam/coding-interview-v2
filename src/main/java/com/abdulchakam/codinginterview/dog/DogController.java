@@ -23,12 +23,12 @@ public class DogController {
     }
 
     @PutMapping("/dog")
-    public ResponseEntity<DogResponse> updateDog(@RequestBody DogRequest request) {
+    public ResponseEntity<DogResponse> update(@RequestBody DogRequest request) {
         return dogService.updateDog(request);
     }
 
     @DeleteMapping("/dog")
-    public ResponseEntity<BaseResponse> deleteDog(@RequestBody DogRequest request) {
+    public ResponseEntity<BaseResponse> delete(@RequestBody DogRequest request) {
         return dogService.deleteDog(request);
     }
 }
