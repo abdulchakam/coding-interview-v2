@@ -18,7 +18,9 @@ public class TimeoutRestTemplateFactory implements RestTemplateFactory {
         RestTemplate restTemplate = new RestTemplate();
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
         RequestConfig requestConfig = RequestConfig.custom()
-                        .setConnectTimeout(Timeout.ofMilliseconds(connectionTimeout)).setConnectionRequestTimeout(Timeout.ofMilliseconds(connectionTimeout)).build();
+                .setConnectTimeout(Timeout.ofMilliseconds(connectionTimeout))
+                .setConnectionRequestTimeout(Timeout.ofMilliseconds(connectionTimeout))
+                .build();
         factory.setHttpClient(HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build());
 
         restTemplate.setRequestFactory(factory);
