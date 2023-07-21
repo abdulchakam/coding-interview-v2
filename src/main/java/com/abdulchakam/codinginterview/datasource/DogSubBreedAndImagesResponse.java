@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DogSubBreedResponse {
+public class DogSubBreedAndImagesResponse {
     List<String> message;
     String status;
 }

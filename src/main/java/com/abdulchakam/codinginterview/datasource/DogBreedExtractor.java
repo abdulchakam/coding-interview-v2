@@ -6,31 +6,39 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 @Component
-@Slf4j
-public class DogBreedFactory {
+public class DogBreedExtractor {
 
-    public DogBreedResponse extractSubToParentBreed(Map<String, List<String>> listMap) {
-        Map<String, List<String>> map = new HashMap<>();
+    public DogBreedResponse extractSubToParentBreed(Map<String, List<String>> listMap, boolean isTransform) {
+        Map<String, List<String>> transformedMap = transformBreedMap(listMap, isTransform);
+        Map<String, List<String>> mapSorted = new TreeMap<>(transformedMap);
 
-        for (var data : listMap.entrySet()) {
-            if (data.getKey().equals("sheepdog") || data.getKey().equals("terrier")) {
-                String breed = data.getKey();
-                List<String> subBreeds = data.getValue();
-
-                for (String subBreed : subBreeds) {
-                    String transformedKey = breed+"-"+subBreed;
-                    map.put(transformedKey, new ArrayList<>());
-                }
-
-            } else {
-                map.put(data.getKey(), data.getValue());
-            }
-        }
-
-        Map<String, List<String>> mapSorted = new TreeMap<>(map);
         return DogBreedResponse.builder()
                 .message(mapSorted)
                 .status("success")
                 .build();
+    }
+
+    private Map<String, List<String>> transformBreedMap(Map<String, List<String>> listMap, boolean isTransform) {
+        Map<String, List<String>> transformedMap = new HashMap<>();
+
+        for (var data : listMap.entrySet()) {
+            String breed = data.getKey();
+            List<String> subBreeds = data.getValue();
+
+            if (isTransform && shouldTransformBreed(breed)) {
+                for (String subBreed : subBreeds) {
+                    String transformedKey = breed + "-" + subBreed;
+                    transformedMap.put(transformedKey, new ArrayList<>());
+                }
+            } else {
+                transformedMap.put(breed, subBreeds);
+            }
+        }
+
+        return transformedMap;
+    }
+
+    private boolean shouldTransformBreed(String breed) {
+        return breed.equals("sheepdog") || breed.equals("terrier");
     }
 }

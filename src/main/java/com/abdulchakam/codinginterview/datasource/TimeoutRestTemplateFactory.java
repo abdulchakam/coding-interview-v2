@@ -1,14 +1,11 @@
 package com.abdulchakam.codinginterview.datasource;
 
-import lombok.extern.java.Log;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.core5.util.Timeout;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
-@Slf4j
 public class TimeoutRestTemplateFactory implements RestTemplateFactory {
     private final int connectionTimeout;
 

@@ -2,7 +2,9 @@ package com.abdulchakam.codinginterview.dog;
 
 import com.abdulchakam.codinginterview.dto.AnimalRequest;
 import com.abdulchakam.codinginterview.dto.AnimalResponse;
+import com.abdulchakam.codinginterview.dto.BaseResponse;
 import com.abdulchakam.codinginterview.exception.DataAlreadyExistException;
+import com.abdulchakam.codinginterview.exception.DataNotFoundException;
 import com.abdulchakam.codinginterview.interfaces.AnimalService;
 import com.abdulchakam.codinginterview.model.Dog;
 import com.abdulchakam.codinginterview.model.SubBreed;
@@ -13,11 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ServerErrorException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -38,7 +39,6 @@ public class DogService implements AnimalService {
         int status;
 
         try {
-            log.info("REQUEST : {}", dogRequest);
             // Validate dog name
             Optional<Dog> dogOptional = dogRepository.findByDogName(dogRequest.getDogName());
             if (dogOptional.isPresent()) {
@@ -77,9 +77,26 @@ public class DogService implements AnimalService {
         String statusMessage, message;
         int status;
         AnimalResponse animalResponse = new AnimalResponse();
+        List<DogResponseDto> dogResponseDtoList = new ArrayList<>();
 
         try {
             animalResponse = all();
+
+            animalResponse.getDogList().forEach(dog -> {
+                DogResponseDto dogResponseDto = new DogResponseDto();
+                dogResponseDto.setBreed(dog.getBreed());
+                dogResponseDto.setDogName(dog.getDogName());
+
+                if (!dog.getSubBreeds().isEmpty()) {
+                    Map<String, List<String>> listMap = new HashMap<>();
+                    for (SubBreed subBreed : dog.getSubBreeds()){
+                        listMap.put(subBreed.getSubBreedName(), new ArrayList<>());
+                    }
+                    dogResponseDto.setSubBreeds(listMap);
+                }
+
+                dogResponseDtoList.add(dogResponseDto);
+            });
 
             statusMessage = HttpStatus.OK.getReasonPhrase();
             status = HttpStatus.OK.value();
@@ -88,7 +105,7 @@ public class DogService implements AnimalService {
         } catch (ServerErrorException e) {
             statusMessage = HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase();
             status = HttpStatus.INTERNAL_SERVER_ERROR.value();
-            message = "Error when create breed, "+ e.getMessage();
+            message = "Error when show all, "+ e.getMessage();
         }
 
 
@@ -98,7 +115,46 @@ public class DogService implements AnimalService {
                         .status(status)
                         .statusMessage(statusMessage)
                         .message(message)
-                        .dogList(animalResponse.getDogList())
+                        .dogList(dogResponseDtoList)
+                        .build());
+    }
+
+    @Transactional
+    public ResponseEntity<BaseResponse> deleteDog(DogRequest dogRequest) {
+        log.info("Start delete dog");
+        String statusMessage, message;
+        int status;
+
+        try {
+            Dog dog = new Dog();
+            dog.setId(dogRequest.getId());
+
+            Optional<Dog> dogOpt = dogRepository.findById(dogRequest.getId());
+            if (dogOpt.isEmpty()) {
+                throw new DataNotFoundException("Data dog not found!");
+            }
+
+            delete(AnimalRequest
+                    .builder()
+                    .dog(dog)
+                    .build());
+
+            statusMessage = HttpStatus.OK.getReasonPhrase();
+            status = HttpStatus.OK.value();
+            message = "Success delete dog";
+
+        } catch (ServerErrorException e) {
+            statusMessage = HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase();
+            status = HttpStatus.INTERNAL_SERVER_ERROR.value();
+            message = "Error when delete dog, "+ e.getMessage();
+        }
+
+        return ResponseEntity
+                .status(status)
+                .body(DogResponse.builder()
+                        .status(status)
+                        .statusMessage(statusMessage)
+                        .message(message)
                         .build());
     }
 
@@ -131,7 +187,10 @@ public class DogService implements AnimalService {
     }
 
     @Override
-    public void delete() {
-
+    public void delete(AnimalRequest animalRequest) {
+        dogRepository.deleteById(animalRequest.getDog().getId());
+        if (!subBreedRepository.findByDogId(animalRequest.getDog().getId()).isEmpty()) {
+            subBreedRepository.deleteByDogId(animalRequest.getDog().getId());
+        }
     }
 }

@@ -7,5 +7,5 @@ public interface AnimalService {
     void create(AnimalRequest animalRequest);
     AnimalResponse all();
     void update();
-    void delete();
+    void delete(AnimalRequest animalRequest);
 }

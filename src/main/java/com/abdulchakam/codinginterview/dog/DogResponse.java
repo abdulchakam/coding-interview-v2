@@ -22,5 +22,5 @@ public class DogResponse extends BaseResponse {
     private DogRequest request;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<Dog> dogList;
+    private List<DogResponseDto> dogList;
 }

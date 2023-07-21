@@ -2,12 +2,13 @@ package com.abdulchakam.codinginterview.dog;
 
 import com.abdulchakam.codinginterview.datasource.DogBreedResponse;
 import com.abdulchakam.codinginterview.datasource.DogBreedServiceImpl;
-import com.abdulchakam.codinginterview.datasource.DogSubBreedResponse;
+import com.abdulchakam.codinginterview.datasource.DogSubBreedAndImagesResponse;
 import com.abdulchakam.codinginterview.exception.DataNotFoundException;
 import com.abdulchakam.codinginterview.model.Dog;
 import com.abdulchakam.codinginterview.model.SubBreed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -41,14 +42,18 @@ public class DogFactory {
         }
 
         // Check sub breed from data source
-        DogSubBreedResponse subBreedResponse = dogBreedService.getSubBreed(request.getBreedName());
+        DogSubBreedAndImagesResponse subBreedResponse = dogBreedService.getSubBreed(request.getBreedName());
         isFoundSubBreed = subBreedResponse.getMessage().isEmpty();
 
         // Block code if sub breed exist
         if (!isFoundSubBreed) {
             subBreedResponse.getMessage().forEach(s -> {
                 SubBreed subBreed = new SubBreed();
-                subBreed.setSubBreedName(s);
+                if (request.getBreedName().equals("sheepdog") || request.getBreedName().equals("terrier")) {
+                    subBreed.setSubBreedName(request.getBreedName()+"-"+s);
+                } else {
+                    subBreed.setSubBreedName(s);
+                }
                 subBreeds.add(subBreed);
             });
         }

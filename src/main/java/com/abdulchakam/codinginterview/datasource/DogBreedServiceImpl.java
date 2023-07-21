@@ -13,7 +13,10 @@ import org.springframework.web.client.RestTemplate;
 public class DogBreedServiceImpl implements DogBreedService{
 
     @Autowired
-    private DogBreedFactory dogBreedFactory;
+    private RestTemplate restTemplate;
+
+    @Autowired
+    private DogBreedExtractor dogBreedExtractor;
 
     @Value("${dog.api.base-url}")
     private String apiBaseUrl;
@@ -32,14 +35,14 @@ public class DogBreedServiceImpl implements DogBreedService{
                 DogBreedResponse.class);
 
         if (response.getBody() != null) {
-            dogBreedResponse = dogBreedFactory.extractSubToParentBreed(response.getBody().getMessage());
+            dogBreedResponse = dogBreedExtractor.extractSubToParentBreed(response.getBody().getMessage(), false);
         }
 
         return dogBreedResponse;
     }
 
     @Override
-    public DogSubBreedResponse getSubBreed(String breed) {
+    public DogSubBreedAndImagesResponse getSubBreed(String breed) {
         String urlSubBreed =  apiBaseUrl.concat("/breed/"+breed+"/list");
 
         RestTemplateFactory restTemplateFactory2 = new TimeoutRestTemplateFactory(2000);
@@ -48,7 +51,31 @@ public class DogBreedServiceImpl implements DogBreedService{
         var response = restTemplate2.exchange(urlSubBreed,
                 HttpMethod.GET,
                 null,
-                DogSubBreedResponse.class);
+                DogSubBreedAndImagesResponse.class);
+
+        return response.getBody();
+    }
+
+    @Override
+    public DogSubBreedAndImagesResponse getImageByBreed(String breed) {
+        String url =  apiBaseUrl.concat("/breed/"+breed+"/images");
+
+        var response = restTemplate.exchange(url,
+                HttpMethod.GET,
+                null,
+                DogSubBreedAndImagesResponse.class);
+
+        return response.getBody();
+    }
+
+    @Override
+    public DogSubBreedAndImagesResponse getImageBySubBreed(String breed, String subBreed) {
+        String url =  apiBaseUrl.concat("/breed/"+breed+"/"+subBreed+"/images");
+
+        var response = restTemplate.exchange(url,
+                HttpMethod.GET,
+                null,
+                DogSubBreedAndImagesResponse.class);
 
         return response.getBody();
     }

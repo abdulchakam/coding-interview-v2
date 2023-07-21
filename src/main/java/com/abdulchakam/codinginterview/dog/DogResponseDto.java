@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 @Data
 @Builder
@@ -15,5 +16,5 @@ public class DogResponseDto {
 
     private String dogName;
     private String breed;
-    private List<String> subBreeds;
+    private Map<String,List<String>> subBreeds;
 }
