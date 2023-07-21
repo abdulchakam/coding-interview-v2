@@ -17,6 +17,7 @@
        	modified_date timestamp(0) NULL,
        	modified_by varchar(100) NULL,
        	is_deleted bool NOT NULL,
+       	images text NULL,
        	CONSTRAINT dog_pk PRIMARY KEY (id)
     );
 
@@ -35,5 +36,6 @@ CREATE SEQUENCE public.sub_breed_seq
     	id numeric(20) NOT NULL DEFAULT nextval('sub_breed_seq'::regclass),
     	dog_id numeric(20) NOT NULL,
     	sub_breed_name varchar(200) NULL,
+    	images text NULL,
     	CONSTRAINT sub_breed_pk PRIMARY KEY (id)
     );

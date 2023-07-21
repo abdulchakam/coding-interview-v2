@@ -29,6 +29,9 @@ public class Dog {
     @JsonIgnoreProperties("dog")
     private List<SubBreed> subBreeds;
 
+    @Column(name = "images")
+    private String images;
+
     @Column(name = "created_date")
     private Date createdDate;
 

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
+
 @Entity
 @Table(name = "sub_breed")
 @Data
@@ -20,4 +22,7 @@ public class SubBreed {
 
     @Column(name = "sub_breed_name")
     private String subBreedName;
+
+    @Column(name = "images")
+    private String images;
 }

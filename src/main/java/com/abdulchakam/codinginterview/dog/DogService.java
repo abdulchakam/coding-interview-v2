@@ -3,6 +3,7 @@ package com.abdulchakam.codinginterview.dog;
 import com.abdulchakam.codinginterview.dto.AnimalRequest;
 import com.abdulchakam.codinginterview.dto.AnimalResponse;
 import com.abdulchakam.codinginterview.dto.BaseResponse;
+import com.abdulchakam.codinginterview.exception.BadRequestException;
 import com.abdulchakam.codinginterview.exception.DataAlreadyExistException;
 import com.abdulchakam.codinginterview.exception.DataNotFoundException;
 import com.abdulchakam.codinginterview.interfaces.AnimalService;
@@ -10,6 +11,7 @@ import com.abdulchakam.codinginterview.model.Dog;
 import com.abdulchakam.codinginterview.model.SubBreed;
 import com.abdulchakam.codinginterview.repository.DogRepository;
 import com.abdulchakam.codinginterview.repository.SubBreedRepository;
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -45,6 +47,10 @@ public class DogService implements AnimalService {
                 throw new DataAlreadyExistException("Dog name already exist");
             }
 
+            if (dogRequest.getBreedName().equals("shiba") && dogRequest.getGetNumberOfImages() % 2 == 0) {
+                throw new BadRequestException("Sorry shiba, you can only choose an odd number of images :( ");
+            }
+
             Dog dog = dogFactory.fromRequest(dogRequest);
 
             create(AnimalRequest.builder()
@@ -78,19 +84,22 @@ public class DogService implements AnimalService {
         int status;
         AnimalResponse animalResponse = new AnimalResponse();
         List<DogResponseDto> dogResponseDtoList = new ArrayList<>();
+        Gson gson = new Gson();
 
         try {
+
             animalResponse = all();
 
             animalResponse.getDogList().forEach(dog -> {
                 DogResponseDto dogResponseDto = new DogResponseDto();
                 dogResponseDto.setBreed(dog.getBreed());
                 dogResponseDto.setDogName(dog.getDogName());
+                dogResponseDto.setImages(gson.fromJson(dog.getImages(), List.class));
 
                 if (!dog.getSubBreeds().isEmpty()) {
                     Map<String, List<String>> listMap = new HashMap<>();
                     for (SubBreed subBreed : dog.getSubBreeds()){
-                        listMap.put(subBreed.getSubBreedName(), new ArrayList<>());
+                        listMap.put(subBreed.getSubBreedName(), gson.fromJson(subBreed.getImages(), List.class));
                     }
                     dogResponseDto.setSubBreeds(listMap);
                 }

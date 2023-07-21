@@ -4,6 +4,5 @@ public interface DogBreedService {
 
     DogBreedResponse getAllBreed();
     DogSubBreedAndImagesResponse getSubBreed(String breed);
-    DogSubBreedAndImagesResponse getImageByBreed(String breed);
-    DogSubBreedAndImagesResponse getImageBySubBreed(String breed, String subBreed);
+    DogSubBreedAndImagesResponse getImage(String breed, String subBreed, int numberOfImages);
 }

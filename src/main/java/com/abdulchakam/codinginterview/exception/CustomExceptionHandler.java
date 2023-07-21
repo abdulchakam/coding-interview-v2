@@ -31,6 +31,14 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return errorResponse;
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<Object> handleClientException(BadRequestException ex) {
+        logger.error("BadRequestException Exception : ", ex);
+        var body = new HashMap<String, String>();
+        body.put("errors", ex.getMessage());
+        return new ResponseEntity<>(body, ex.getHttpStatus());
+    }
+
     @ExceptionHandler(DataNotFoundException.class)
     public ResponseEntity<Object> handleClientException(DataNotFoundException ex) {
         logger.error("DataNotFound Exception : ", ex);

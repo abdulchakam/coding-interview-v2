@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.RestTemplate;
 
 
@@ -57,9 +58,8 @@ public class DogBreedServiceImpl implements DogBreedService{
     }
 
     @Override
-    public DogSubBreedAndImagesResponse getImageByBreed(String breed) {
-        String url =  apiBaseUrl.concat("/breed/"+breed+"/images");
-
+    public DogSubBreedAndImagesResponse getImage(String breed, String subBreed, int numberOfImages) {
+        String url = urlGetImages(breed, subBreed, numberOfImages);
         var response = restTemplate.exchange(url,
                 HttpMethod.GET,
                 null,
@@ -68,15 +68,14 @@ public class DogBreedServiceImpl implements DogBreedService{
         return response.getBody();
     }
 
-    @Override
-    public DogSubBreedAndImagesResponse getImageBySubBreed(String breed, String subBreed) {
-        String url =  apiBaseUrl.concat("/breed/"+breed+"/"+subBreed+"/images");
+    private String urlGetImages(String breed, String subBreed, int numberOfImages) {
+        String url;
+        if (!ObjectUtils.isEmpty(subBreed)) {
+            url =  apiBaseUrl.concat("/breed/"+breed+"/"+subBreed+"/images/random/"+numberOfImages);
+        } else {
+            url =  apiBaseUrl.concat("/breed/"+breed+"/images/random/"+numberOfImages);
+        }
 
-        var response = restTemplate.exchange(url,
-                HttpMethod.GET,
-                null,
-                DogSubBreedAndImagesResponse.class);
-
-        return response.getBody();
+        return url;
     }
 }
