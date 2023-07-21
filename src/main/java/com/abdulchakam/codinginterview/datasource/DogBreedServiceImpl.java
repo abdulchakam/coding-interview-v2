@@ -30,7 +30,7 @@ public class DogBreedServiceImpl implements DogBreedService{
             DogBreedResponse dogBreedResponse = new DogBreedResponse();
             String urlGetAllBreeds = apiBaseUrl.concat("/breeds/list/all");
 
-            RestTemplateFactory restTemplateFactory1 = new TimeoutRestTemplateFactory(500);
+            RestTemplateFactory restTemplateFactory1 = new TimeoutRestTemplateFactory(5000);
             RestTemplate restTemplate1 = restTemplateFactory1.createRestTemplate();
 
             Instant startTime = Instant.now();
@@ -60,7 +60,7 @@ public class DogBreedServiceImpl implements DogBreedService{
         try {
             String urlSubBreed =  apiBaseUrl.concat("/breed/"+breed+"/list");
 
-            RestTemplateFactory restTemplateFactory2 = new TimeoutRestTemplateFactory(200);
+            RestTemplateFactory restTemplateFactory2 = new TimeoutRestTemplateFactory(2000);
             RestTemplate restTemplate2 = restTemplateFactory2.createRestTemplate();
 
             Instant startTime = Instant.now();
