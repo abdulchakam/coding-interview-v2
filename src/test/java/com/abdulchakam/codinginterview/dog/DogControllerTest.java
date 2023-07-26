@@ -42,7 +42,7 @@ public class DogControllerTest {
         DogRequest validRequest = new DogRequest();
         DogResponse expectedResponse = new DogResponse();
 
-        when(dogService.dataFromRest(validRequest)).thenReturn(ResponseEntity.status(HttpStatus.CREATED).body(expectedResponse));
+        when(dogService.storeDog(validRequest)).thenReturn(ResponseEntity.status(HttpStatus.CREATED).body(expectedResponse));
         ResponseEntity<DogResponse> responseEntity = dogController.store(validRequest);
 
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
@@ -74,8 +74,8 @@ public class DogControllerTest {
         DogRequest validRequest = new DogRequest();
         DogResponse expectedResponse = new DogResponse();
 
-        when(dogService.updateDog(validRequest)).thenReturn(ResponseEntity.ok(expectedResponse));
-        ResponseEntity<DogResponse> responseEntity = dogController.update(validRequest);
+        when(dogService.updateDog(1L, validRequest)).thenReturn(ResponseEntity.ok(expectedResponse));
+        ResponseEntity<DogResponse> responseEntity = dogController.update(1L, validRequest);
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(expectedResponse, responseEntity.getBody());
@@ -83,11 +83,10 @@ public class DogControllerTest {
 
     @Test
     public void testDelete_expectSuccess() {
-        DogRequest validRequest = new DogRequest();
         BaseResponse expectedResponse = new BaseResponse();
 
-        when(dogService.deleteDog(validRequest)).thenReturn(ResponseEntity.ok(expectedResponse));
-        ResponseEntity<BaseResponse> responseEntity = dogController.delete(validRequest);
+        when(dogService.deleteDog(1L)).thenReturn(ResponseEntity.ok(expectedResponse));
+        ResponseEntity<BaseResponse> responseEntity = dogController.delete(1L);
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(expectedResponse, responseEntity.getBody());
