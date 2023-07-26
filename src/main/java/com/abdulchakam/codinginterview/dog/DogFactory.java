@@ -47,7 +47,6 @@ public class DogFactory {
                 : new DogSubBreedAndImagesResponse();
 
         return Dog.builder()
-                .id(request.getId())
                 .dogName(request.getDogName())
                 .breed(breedName)
                 .images(gson.toJson(imagesBreed.getMessage()))

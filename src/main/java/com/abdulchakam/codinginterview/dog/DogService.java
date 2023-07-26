@@ -18,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.server.ServerErrorException;
 
 import java.util.*;
@@ -36,14 +35,14 @@ public class DogService implements AnimalService {
     @Autowired
     private SubBreedRepository subBreedRepository;
 
-    public ResponseEntity<DogResponse> dataFromRest(DogRequest dogRequest) {
+    public ResponseEntity<DogResponse> storeDog(DogRequest dogRequest) {
         log.info("Start store dog");
         String statusMessage, message;
         int status;
 
         try {
             // Validate dog name
-            validateDogName(dogRequest);
+            validateDogName(null, dogRequest);
             onlyOddNumber(dogRequest, "shiba");
 
             Dog dog = dogFactory.fromRequest(dogRequest);
@@ -126,16 +125,16 @@ public class DogService implements AnimalService {
     }
 
     @Transactional
-    public ResponseEntity<BaseResponse> deleteDog(DogRequest dogRequest) {
+    public ResponseEntity<BaseResponse> deleteDog(Long id) {
         log.info("Start delete dog");
         String statusMessage, message;
         int status;
 
         try {
             Dog dog = new Dog();
-            dog.setId(dogRequest.getId());
+            dog.setId(id);
 
-            Optional<Dog> dogOpt = dogRepository.findById(dogRequest.getId());
+            Optional<Dog> dogOpt = dogRepository.findById(id);
             if (dogOpt.isEmpty()) {
                 throw new DataNotFoundException("Data dog not found!");
             }
@@ -165,22 +164,23 @@ public class DogService implements AnimalService {
     }
 
     @Transactional
-    public ResponseEntity<DogResponse> updateDog(DogRequest dogRequest) {
+    public ResponseEntity<DogResponse> updateDog(Long dogId, DogRequest dogRequest) {
         log.info("Start update dog");
         String statusMessage, message;
         int status;
 
         try {
-            validateDogName(dogRequest);
+            validateDogName(dogId, dogRequest);
             onlyOddNumber(dogRequest, "shiba");
 
-            Optional<Dog> dogOptional = dogRepository.findById(dogRequest.getId());
+            Optional<Dog> dogOptional = dogRepository.findById(dogId);
             Dog dog = dogFactory.fromRequest(dogRequest);
 
             if (dogOptional.isPresent()) {
                 dog.setCreatedDate(dogOptional.get().getCreatedDate());
                 dog.setCreatedBy("SYSTEM");
             }
+            dog.setId(dogId);
             dog.setModifiedDate(new Date());
             dog.setModifiedBy("SYSTEM");
 
@@ -208,13 +208,13 @@ public class DogService implements AnimalService {
                         .build());
     }
 
-    void validateDogName(DogRequest dogRequest) {
+    void validateDogName(Long dogId, DogRequest dogRequest) {
         Optional<Dog> dogOptional = dogRepository.findByDogName(dogRequest.getDogName());
-        if (dogOptional.isPresent() && ObjectUtils.isEmpty(dogRequest.getId())) {
+        if (dogOptional.isPresent() && dogId == null) {
             throw new DataAlreadyExistException("Dog name already exist");
-
         }
-        if (dogOptional.isPresent() && (dogRequest.getId()!= null && !dogRequest.getId().equals(dogOptional.get().getId()))) {
+
+        if (dogOptional.isPresent() && !dogId.equals(dogOptional.get().getId())) {
             throw new DataAlreadyExistException("Dog name already exist");
         }
     }

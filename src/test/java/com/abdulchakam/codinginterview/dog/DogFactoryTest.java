@@ -54,14 +54,12 @@ public class DogFactoryTest {
         ReflectionTestUtils.setField(dogFactory, "gson", gson);
 
         DogRequest dogRequest = new DogRequest();
-        dogRequest.setId(1L);
         dogRequest.setDogName("dogName");
         dogRequest.setBreedName("breed1");
         dogRequest.setGetNumberOfImages(3);
 
         Dog result = dogFactory.fromRequest(dogRequest);
 
-        assertEquals(dogRequest.getId(), result.getId());
         assertEquals(dogRequest.getDogName(), result.getDogName());
         assertEquals(dogRequest.getBreedName(), result.getBreed());
 

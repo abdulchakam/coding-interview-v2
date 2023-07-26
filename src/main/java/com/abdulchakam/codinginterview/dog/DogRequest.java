@@ -1,7 +1,5 @@
 package com.abdulchakam.codinginterview.dog;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -14,9 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DogRequest {
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Long id;
 
     @NotBlank(message = "Dog name is mandatory")
     private String dogName;

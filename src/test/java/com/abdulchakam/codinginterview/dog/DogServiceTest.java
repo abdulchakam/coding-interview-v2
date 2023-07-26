@@ -70,7 +70,7 @@ public class DogServiceTest {
         when(dogFactory.fromRequest(dogRequest)).thenReturn(dog);
         when(dogRepository.save(any(Dog.class))).thenReturn(dog);
 
-        ResponseEntity<DogResponse> responseEntity = dogService.dataFromRest(dogRequest);
+        ResponseEntity<DogResponse> responseEntity = dogService.storeDog(dogRequest);
 
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
         assertEquals("Success create dog", Objects.requireNonNull(responseEntity.getBody()).getMessage());
@@ -100,7 +100,7 @@ public class DogServiceTest {
         when(dogFactory.fromRequest(dogRequest)).thenReturn(dog);
         when(dogRepository.save(any(Dog.class))).thenReturn(dog);
 
-        assertThrows(DataAlreadyExistException.class, () -> dogService.dataFromRest(dogRequest));
+        assertThrows(DataAlreadyExistException.class, () -> dogService.storeDog(dogRequest));
     }
 
     @Test
@@ -147,7 +147,6 @@ public class DogServiceTest {
         dogRequest.setDogName("dogName");
         dogRequest.setBreedName("breedName");
         dogRequest.setGetNumberOfImages(10);
-        dogRequest.setId(1L);
 
         // Mock object dog
         Dog dog = new Dog();
@@ -168,13 +167,13 @@ public class DogServiceTest {
         subBreed.setSubBreedName("sub breed");
         subBreed.setImages("images");
 
-        when(subBreedRepository.findByDogId(dogRequest.getId())).thenReturn(List.of(subBreed));
+        when(subBreedRepository.findByDogId(1L)).thenReturn(List.of(subBreed));
 
         when(dogFactory.fromRequest(dogRequest)).thenReturn(dog);
-        when(dogRepository.findById(dogRequest.getId())).thenReturn(Optional.of(dog));
+        when(dogRepository.findById(1L)).thenReturn(Optional.of(dog));
         when(dogRepository.save(any(Dog.class))).thenReturn(dog);
 
-        ResponseEntity<DogResponse> responseEntity = dogService.updateDog(dogRequest);
+        ResponseEntity<DogResponse> responseEntity = dogService.updateDog(1L, dogRequest);
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals("Success update dog", Objects.requireNonNull(responseEntity.getBody()).getMessage());
@@ -187,7 +186,6 @@ public class DogServiceTest {
         dogRequest.setDogName("dogName");
         dogRequest.setBreedName("breedName");
         dogRequest.setGetNumberOfImages(10);
-        dogRequest.setId(1L);
 
         // Mock object dog
         Dog dog = new Dog();
@@ -207,7 +205,7 @@ public class DogServiceTest {
         when(dogFactory.fromRequest(dogRequest)).thenReturn(dog);
         when(dogRepository.save(any(Dog.class))).thenReturn(dog);
 
-        assertThrows(DataAlreadyExistException.class, ()-> dogService.updateDog(dogRequest));
+        assertThrows(DataAlreadyExistException.class, ()-> dogService.updateDog(1L, dogRequest));
     }
 
     @Test
@@ -217,7 +215,6 @@ public class DogServiceTest {
         dogRequest.setDogName("dogName");
         dogRequest.setBreedName("breedName");
         dogRequest.setGetNumberOfImages(10);
-        dogRequest.setId(1L);
 
         // Mock object dog
         Dog dog = new Dog();
@@ -236,7 +233,7 @@ public class DogServiceTest {
         when(dogFactory.fromRequest(dogRequest)).thenReturn(dog);
         when(dogRepository.save(any(Dog.class))).thenReturn(dog);
 
-        assertThrows(DataAlreadyExistException.class, ()-> dogService.updateDog(dogRequest));
+        assertThrows(DataAlreadyExistException.class, ()-> dogService.updateDog(1L, dogRequest));
     }
 
     @Test
@@ -246,7 +243,6 @@ public class DogServiceTest {
         dogRequest.setDogName("dog shiba");
         dogRequest.setBreedName("shiba");
         dogRequest.setGetNumberOfImages(10);
-        dogRequest.setId(1L);
 
         // Mock object dog
         Dog dog = new Dog();
@@ -266,14 +262,11 @@ public class DogServiceTest {
         when(dogFactory.fromRequest(dogRequest)).thenReturn(dog);
         when(dogRepository.save(any(Dog.class))).thenReturn(dog);
 
-        assertThrows(BadRequestException.class, ()-> dogService.updateDog(dogRequest));
+        assertThrows(BadRequestException.class, ()-> dogService.updateDog(1L, dogRequest));
     }
 
     @Test
     public void testDeleteDog_expectSuccess() {
-        // Mock dog request
-        DogRequest dogRequest = new DogRequest();
-        dogRequest.setId(1L);
 
         // Mock object dog
         Dog dog = new Dog();
@@ -292,10 +285,10 @@ public class DogServiceTest {
         subBreed.setSubBreedName("sub breed");
         subBreed.setImages("images");
 
-        when(subBreedRepository.findByDogId(dogRequest.getId())).thenReturn(List.of(subBreed));
-        when(dogRepository.findById(dogRequest.getId())).thenReturn(Optional.of(dog));
+        when(subBreedRepository.findByDogId(1L)).thenReturn(List.of(subBreed));
+        when(dogRepository.findById(1L)).thenReturn(Optional.of(dog));
 
-        ResponseEntity<BaseResponse> responseEntity = dogService.deleteDog(dogRequest);
+        ResponseEntity<BaseResponse> responseEntity = dogService.deleteDog(1L);
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals("Success delete dog", Objects.requireNonNull(responseEntity.getBody()).getMessage());
@@ -303,11 +296,8 @@ public class DogServiceTest {
 
     @Test
     public void testDeleteDog_expectFailedDogNotFound() {
-        // Mock dog request
-        DogRequest dogRequest = new DogRequest();
-        dogRequest.setId(1L);
-        when(dogRepository.findById(dogRequest.getId())).thenReturn(Optional.empty());
+        when(dogRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(DataNotFoundException.class, ()-> dogService.deleteDog(dogRequest));
+        assertThrows(DataNotFoundException.class, ()-> dogService.deleteDog(1L));
     }
 }

@@ -1,6 +1,7 @@
 package com.abdulchakam.codinginterview.dog;
 
 import com.abdulchakam.codinginterview.dto.BaseResponse;
+import io.swagger.annotations.ApiOperation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,23 +13,28 @@ public class DogController {
     @Autowired
     private DogService dogService;
 
+    @ApiOperation(value = "Create new dog")
     @PostMapping("/dog")
     public ResponseEntity<DogResponse> store(@Valid @RequestBody DogRequest request) {
-        return dogService.dataFromRest(request);
+        return dogService.storeDog(request);
     }
 
-    @GetMapping("/dog/all")
+    @ApiOperation(value = "Get all dog list")
+    @GetMapping("/dog")
     public ResponseEntity<DogResponse> showAll() {
         return dogService.showAll();
     }
 
-    @PutMapping("/dog")
-    public ResponseEntity<DogResponse> update(@RequestBody DogRequest request) {
-        return dogService.updateDog(request);
+    @ApiOperation(value = "Update dog")
+    @PutMapping("/dog/{dogId}")
+    public ResponseEntity<DogResponse> update(@RequestParam Long dogId,
+                                              @RequestBody DogRequest request) {
+        return dogService.updateDog(dogId, request);
     }
 
-    @DeleteMapping("/dog")
-    public ResponseEntity<BaseResponse> delete(@RequestBody DogRequest request) {
-        return dogService.deleteDog(request);
+    @ApiOperation(value = "Delete dog")
+    @DeleteMapping("/dog/{dogId}")
+    public ResponseEntity<BaseResponse> delete(@RequestParam Long dogId) {
+        return dogService.deleteDog(dogId);
     }
 }
